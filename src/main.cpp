@@ -5,6 +5,9 @@
 #include <vector>
 #include <map>
 #include <algorithm>
+#include <ctime>
+#include <numeric>
+#include <random>
 
 #include "constants.hpp"
 #include "guess.hpp"
@@ -49,6 +52,26 @@ void	print_guesses(std::vector<Guess> const & guesses) {
 	}
 }
 
+std::string get_wordle(std::set<std::string> const & dict) {
+	std::vector<int> v(dict.size());
+	std::iota(v.begin(), v.end(), 0);
+	std::shuffle(v.begin(), v.end(), std::default_random_engine(1978255));
+
+	time_t seconds = time(0);
+	int days = v[seconds/(60 * 60 * 24) % dict.size()];
+
+	std::set<std::string>::const_iterator it = dict.begin();
+	int i = 0;
+	while (i != days) {
+		++it;
+		++i;
+	}
+
+	std::string word = *it;
+	transform(word.begin(), word.end(), word.begin(), toupper);
+	return (word);
+}
+
 int	main() {
 	std::set<std::string> dict;
 	std::vector<Guess> guesses;
@@ -60,8 +83,7 @@ int	main() {
 		return (1);
 	}
 
-	std::string answer = "goats";
-	transform(answer.begin(), answer.end(), answer.begin(), toupper);
+	std::string answer = get_wordle(dict);
 
 	int guess_count = 0;
 	bool solved = false;
